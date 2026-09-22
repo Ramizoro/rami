@@ -18,12 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const current = document.body.getAttribute('data-page') || '';
   const links = cfg.nav_links.map(l => {
     const active = l.url.replace('.html', '') === current ? ' active' : '';
-    return `<li><a href="${l.url}" class="nav-link${active}">${NAV_ICON_TAG(l.label)}<span>${l.label}</span></a></li>`;
+    return `<li><a href="${l.url}" class="nav-link${active}" title="${l.label}">${NAV_ICON_TAG(l.label)}<span>${l.label}</span></a></li>`;
   }).join('');
 
   const navEl = document.getElementById('site-nav');
   if (navEl) {
-    navEl.innerHTML = `<div class="nav-inner"><ul class="nav-links">${links}</ul><a class="nav-github" href="https://github.com/${cfg.github}" target="_blank" rel="noopener" aria-label="GitHub">${GITHUB_ICON}<span>GitHub</span></a><button class="theme-toggle" id="theme-btn" aria-label="Toggle dark mode"><span id="theme-icon">${saved === 'dark' ? '☀️' : '🌙'}</span></button></div>`;
+    navEl.innerHTML = `<div class="nav-inner"><ul class="nav-links">${links}</ul><a class="nav-github" href="https://github.com/${cfg.github}" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub: ${cfg.github}">${GITHUB_ICON}<span>GitHub</span></a><button class="theme-toggle" id="theme-btn" aria-label="Toggle dark mode" title="Toggle dark/light mode"><span id="theme-icon">${saved === 'dark' ? '☀️' : '🌙'}</span></button></div>`;
     document.getElementById('theme-btn').addEventListener('click', () => {
       const cur = document.documentElement.getAttribute('data-theme');
       const next = cur === 'dark' ? 'light' : 'dark';
@@ -114,11 +114,46 @@ document.addEventListener('DOMContentLoaded', () => {
       ctx.shadowBlur = 0;
       if (p !== dragging) {
         p.x += p.vx; p.y += p.vy;
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        // Clamp to canvas bounds (not just flip velocity) so a fast mouse shove can't push a node off-screen for good.
+        if (p.x < 0) { p.x = 0; p.vx = Math.abs(p.vx); }
+        else if (p.x > canvas.width) { p.x = canvas.width; p.vx = -Math.abs(p.vx); }
+        if (p.y < 0) { p.y = 0; p.vy = Math.abs(p.vy); }
+        else if (p.y > canvas.height) { p.y = canvas.height; p.vy = -Math.abs(p.vy); }
       }
     });
     requestAnimationFrame(tick);
   }
   tick();
 })();
+
+// Right-edge scroll progress line — shows how much of the page is left.
+(function () {
+  const bar = document.createElement('div');
+  bar.id = 'scroll-indicator';
+  document.body.appendChild(bar);
+  function update() {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max > 0 ? (window.scrollY / max) * 100 : 0;
+    document.documentElement.style.setProperty('--scroll-fill', pct + '%');
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+  update();
+})();
+
+// Left-click on data-copy-email opens the mail client as normal (default <a href="mailto:"> behavior).
+// Right-click (contextmenu) copies the address instead and shows a confirmation bubble.
+document.addEventListener('contextmenu', e => {
+  const el = e.target.closest('[data-copy-email]');
+  if (!el) return;
+  e.preventDefault();
+  const email = el.dataset.copyEmail;
+  navigator.clipboard.writeText(email).catch(() => {});
+  const bubble = document.createElement('div');
+  bubble.className = 'broken-link-bubble';
+  bubble.textContent = `📋 Copied ${email}`;
+  bubble.style.left = `${e.clientX}px`;
+  bubble.style.top = `${e.clientY + window.scrollY - 8}px`;
+  document.body.appendChild(bubble);
+  setTimeout(() => bubble.remove(), 1600);
+});
