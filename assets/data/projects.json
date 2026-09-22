@@ -1,0 +1,32 @@
+[
+  {
+    "category": "projects",
+    "tag": "Master's Thesis · Uppsala, 2025",
+    "title": "GFlow-Pruning: GFlowNets for Single-Cell Lineage Inference",
+    "description": "Combines GFlowNets with structural constraints to sample biologically valid lineage trees proportional to a gene-expression reward, over probabilistic cell-lineage reconstruction from single-cell transcriptomic data.",
+    "tags": ["GFlowNets", "Generative Models", "Bioinformatics"],
+    "image": "",
+    "link": { "label": "Full write-up", "url": "research.html" },
+    "hidden": false
+  },
+  {
+    "category": "projects",
+    "tag": "Data Mining Project",
+    "title": "Policy Over Pill",
+    "description": "Applied K-Means clustering, PCA, and ANOVA to WHO global tobacco-control data to surface policy patterns across countries.",
+    "tags": ["K-Means", "PCA", "ANOVA"],
+    "image": "",
+    "link": { "label": "View on GitHub", "url": "#" },
+    "hidden": false
+  },
+  {
+    "category": "work",
+    "tag": "Startup · Co-founder / Ops",
+    "title": "TalosynIT — Shohochori & AlapAI",
+    "description": "Early-stage startup building two products, Shohochori and AlapAI. I help run the operational side — onboarding, docs, and getting the company's presence off the ground.",
+    "tags": ["Early-stage", "Ops"],
+    "image": "",
+    "link": null,
+    "hidden": true
+  }
+]
